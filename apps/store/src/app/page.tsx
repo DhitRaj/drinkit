@@ -121,46 +121,6 @@ const MASTER_CATALOG: Omit<Product, 'id' | 'price' | 'stock' | 'minThreshold' | 
     imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=400&q=80',
   },
   {
-    name: 'Absolut Swedish Premium Vodka',
-    brand: 'Absolut',
-    category: 'vodka',
-    volume: '750ml Bottle',
-    abv: '40%',
-    mrp: 2100,
-    isChilled: true,
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Bacardi Carta Blanca White Rum',
-    brand: 'Bacardi',
-    category: 'rum',
-    volume: '750ml Bottle',
-    abv: '40%',
-    mrp: 1400,
-    isChilled: false,
-    imageUrl: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Bombay Sapphire Botanical Gin',
-    brand: 'Bombay Sapphire',
-    category: 'gin',
-    volume: '750ml Bottle',
-    abv: '47%',
-    mrp: 2750,
-    isChilled: false,
-    imageUrl: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Sula Sauvignon Blanc White Wine',
-    brand: 'Sula Vineyards',
-    category: 'wine',
-    volume: '750ml Bottle',
-    abv: '12.5%',
-    mrp: 999,
-    isChilled: true,
-    imageUrl: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=400&q=80',
-  },
-  {
     name: 'Schweppes Tonic Water (Pack of 4)',
     brand: 'Schweppes',
     category: 'mixers',
@@ -638,26 +598,32 @@ export default function StorePartnerPortal() {
   }, [products]);
 
   return (
-    <div style={ui.wrapper}>
+    <div className="store-wrapper">
       {/* Toast Notification */}
       {toastMessage && <div style={ui.toast}>{toastMessage}</div>}
 
       {/* Top Navbar */}
-      <header style={ui.topBar}>
-        <div style={ui.topBarLeft}>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={ui.mobileMenuBtn}>
+      <header className="store-topbar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="mobile-menu-trigger"
+            style={{ display: 'none', background: 'none', border: 'none', fontSize: 22, cursor: 'pointer' }}
+          >
             ☰
           </button>
-          <div style={ui.brandGroup}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={ui.brandEmoji}>⚡</span>
             <div>
-              <div style={ui.brandText}>drinkit <span style={ui.partnerTag}>PARTNER</span></div>
+              <div style={ui.brandText}>
+                drinkit <span style={ui.partnerTag}>PARTNER</span>
+              </div>
               <div style={ui.storeLocationText}>Koramangala Dark Hub · #104</div>
             </div>
           </div>
         </div>
 
-        <div style={ui.topBarCenter}>
+        <div className="topbar-center-status" style={{ display: 'flex', alignItems: 'center' }}>
           <div style={ui.liveStatusBadge}>
             <span style={{ ...ui.statusDot, background: isStoreOnline ? '#10B981' : '#EF4444' }} />
             <span style={{ fontSize: 13, fontWeight: 800, color: isStoreOnline ? '#065F46' : '#991B1B' }}>
@@ -675,7 +641,7 @@ export default function StorePartnerPortal() {
           </div>
         </div>
 
-        <div style={ui.topBarRight}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={ui.clockPill}>🕒 {currentTime || 'Live'}</div>
           <button
             onClick={() => {
@@ -692,25 +658,22 @@ export default function StorePartnerPortal() {
       </header>
 
       {/* Main Layout Body */}
-      <div style={ui.bodyLayout}>
+      <div className="store-layout">
         {/* Desktop & Mobile Drawer Sidebar */}
-        <aside style={{ ...ui.sidebar, ...(mobileMenuOpen ? ui.sidebarMobileOpen : {}) }}>
-          <div style={ui.sidebarHeader}>
+        <aside className={`store-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
+          <div style={{ padding: '0 8px 12px' }}>
             <div style={ui.sidebarSectionTitle}>OPERATIONS TERMINAL</div>
           </div>
 
-          <nav style={ui.sidebarNav}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
             <button
               onClick={() => {
                 setActiveTab('inventory');
                 setMobileMenuOpen(false);
               }}
-              style={{
-                ...ui.sidebarItem,
-                ...(activeTab === 'inventory' ? ui.sidebarItemActive : {}),
-              }}
+              className={`sidebar-nav-btn ${activeTab === 'inventory' ? 'active' : ''}`}
             >
-              <span style={ui.sidebarItemIcon}>📦</span>
+              <span style={{ fontSize: 18 }}>📦</span>
               <span style={{ flex: 1 }}>Inventory & Catalog</span>
               <span style={ui.sidebarCountPill}>{products.length}</span>
             </button>
@@ -720,12 +683,9 @@ export default function StorePartnerPortal() {
                 setActiveTab('orders');
                 setMobileMenuOpen(false);
               }}
-              style={{
-                ...ui.sidebarItem,
-                ...(activeTab === 'orders' ? ui.sidebarItemActive : {}),
-              }}
+              className={`sidebar-nav-btn ${activeTab === 'orders' ? 'active' : ''}`}
             >
-              <span style={ui.sidebarItemIcon}>🔔</span>
+              <span style={{ fontSize: 18 }}>🔔</span>
               <span style={{ flex: 1 }}>Live POS Orders</span>
               {newOrdersCount > 0 && <span style={ui.sidebarAlertPill}>{newOrdersCount} NEW</span>}
             </button>
@@ -735,12 +695,9 @@ export default function StorePartnerPortal() {
                 setActiveTab('reports');
                 setMobileMenuOpen(false);
               }}
-              style={{
-                ...ui.sidebarItem,
-                ...(activeTab === 'reports' ? ui.sidebarItemActive : {}),
-              }}
+              className={`sidebar-nav-btn ${activeTab === 'reports' ? 'active' : ''}`}
             >
-              <span style={ui.sidebarItemIcon}>📊</span>
+              <span style={{ fontSize: 18 }}>📊</span>
               <span style={{ flex: 1 }}>Sales & Settlements</span>
             </button>
           </nav>
@@ -760,70 +717,70 @@ export default function StorePartnerPortal() {
         {mobileMenuOpen && <div onClick={() => setMobileMenuOpen(false)} style={ui.mobileBackdrop} />}
 
         {/* Content View Container */}
-        <main style={ui.contentArea}>
+        <main className="store-content">
           {/* ========================================================================= */}
           {/* TAB 1: INVENTORY & CATALOG VIEW */}
           {/* ========================================================================= */}
           {activeTab === 'inventory' && (
-            <div style={ui.tabFadeIn}>
+            <div>
               {/* Page Title & Main Action */}
-              <div style={ui.pageHeaderRow}>
+              <div className="page-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, gap: 16 }}>
                 <div>
                   <h1 style={ui.pageTitle}>Inventory & Stock Control</h1>
                   <p style={ui.pageSubtitle}>
                     Real-time drink availability, quick stock increment, and master catalog integration
                   </p>
                 </div>
-                <button onClick={() => setIsAddModalOpen(true)} style={ui.primaryAddButton}>
+                <button onClick={() => setIsAddModalOpen(true)} className="primary-add-btn" style={ui.primaryAddButton}>
                   <span style={{ fontSize: 18, fontWeight: 900 }}>+</span> Add Product
                 </button>
               </div>
 
               {/* KPI Summary Grid */}
-              <div style={ui.kpiGrid}>
-                <div style={ui.kpiCard}>
-                  <div style={ui.kpiLabel}>TOTAL DRINKS IN CATALOG</div>
-                  <div style={ui.kpiValue}>{stats.total}</div>
-                  <div style={ui.kpiSub}>Across all drink categories</div>
+              <div className="kpi-grid">
+                <div className="kpi-card">
+                  <div className="kpi-label">TOTAL DRINKS IN CATALOG</div>
+                  <div className="kpi-val">{stats.total}</div>
+                  <div className="kpi-sub">Across all drink categories</div>
                 </div>
 
-                <div style={{ ...ui.kpiCard, borderLeft: '4px solid #10B981' }}>
-                  <div style={ui.kpiLabel}>LIVE IN CUSTOMER APP</div>
-                  <div style={{ ...ui.kpiValue, color: '#0C831F' }}>{stats.active}</div>
-                  <div style={ui.kpiSub}>Ready for instant 10-min delivery</div>
+                <div className="kpi-card" style={{ borderLeft: '4px solid #10B981' }}>
+                  <div className="kpi-label">LIVE IN CUSTOMER APP</div>
+                  <div className="kpi-val" style={{ color: '#0C831F' }}>{stats.active}</div>
+                  <div className="kpi-sub">Ready for instant 10-min delivery</div>
                 </div>
 
-                <div style={{ ...ui.kpiCard, borderLeft: '4px solid #F59E0B' }}>
-                  <div style={ui.kpiLabel}>LOW STOCK ALERT</div>
-                  <div style={{ ...ui.kpiValue, color: '#D97706' }}>{stats.lowStock}</div>
-                  <div style={ui.kpiSub}>Less than 5 units left in shelf</div>
+                <div className="kpi-card" style={{ borderLeft: '4px solid #F59E0B' }}>
+                  <div className="kpi-label">LOW STOCK ALERT</div>
+                  <div className="kpi-val" style={{ color: '#D97706' }}>{stats.lowStock}</div>
+                  <div className="kpi-sub">Less than 5 units left in shelf</div>
                 </div>
 
-                <div style={{ ...ui.kpiCard, borderLeft: '4px solid #EF4444' }}>
-                  <div style={ui.kpiLabel}>OUT OF STOCK</div>
-                  <div style={{ ...ui.kpiValue, color: '#EF4444' }}>{stats.outStock}</div>
-                  <div style={ui.kpiSub}>Hidden from customers</div>
+                <div className="kpi-card" style={{ borderLeft: '4px solid #EF4444' }}>
+                  <div className="kpi-label">OUT OF STOCK</div>
+                  <div className="kpi-val" style={{ color: '#EF4444' }}>{stats.outStock}</div>
+                  <div className="kpi-sub">Hidden from customers</div>
                 </div>
               </div>
 
               {/* Category Carousel Pills */}
-              <div style={ui.categoryScrollContainer}>
+              <div className="cat-scroll-box">
                 {CATEGORIES.map((cat) => {
                   const isSelected = selectedCategory === cat.id;
                   return (
                     <button
                       key={cat.id}
                       onClick={() => setSelectedCategory(cat.id)}
-                      style={{
-                        ...ui.categoryButton,
-                        ...(isSelected ? ui.categoryButtonActive : {}),
-                      }}
+                      className={`cat-chip ${isSelected ? 'active' : ''}`}
                     >
                       <span style={{ fontSize: 16 }}>{cat.icon}</span>
                       <span>{cat.label}</span>
                       <span
                         style={{
-                          ...ui.categoryCountBadge,
+                          fontSize: 11,
+                          fontWeight: 900,
+                          padding: '2px 8px',
+                          borderRadius: 9999,
                           background: isSelected ? '#FFFFFF' : '#F1F5F9',
                           color: isSelected ? '#0F172A' : '#64748B',
                         }}
@@ -836,8 +793,8 @@ export default function StorePartnerPortal() {
               </div>
 
               {/* Filter and Search Bar */}
-              <div style={ui.filterBar}>
-                <div style={ui.searchBoxWrapper}>
+              <div className="filter-bar-row">
+                <div className="search-box-pill">
                   <span style={{ color: '#94A3B8' }}>🔍</span>
                   <input
                     type="text"
@@ -853,15 +810,12 @@ export default function StorePartnerPortal() {
                   )}
                 </div>
 
-                <div style={ui.statusFilterPills}>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {(['all', 'in_stock', 'low_stock', 'out_of_stock'] as const).map((filterKey) => (
                     <button
                       key={filterKey}
                       onClick={() => setStockFilter(filterKey)}
-                      style={{
-                        ...ui.filterPillBtn,
-                        ...(stockFilter === filterKey ? ui.filterPillBtnActive : {}),
-                      }}
+                      className={`filter-btn-pill ${stockFilter === filterKey ? 'active' : ''}`}
                     >
                       {filterKey === 'all' && 'All Products'}
                       {filterKey === 'in_stock' && '🟢 In Stock'}
@@ -873,14 +827,14 @@ export default function StorePartnerPortal() {
               </div>
 
               {/* Products Table Card */}
-              <div style={ui.tableWrapperCard}>
-                <div style={ui.tableHeadRow}>
-                  <div style={{ flex: 3 }}>PRODUCT & DETAILS</div>
-                  <div style={{ flex: 1.5 }}>CATEGORY / ABV</div>
-                  <div style={{ flex: 1.5 }}>PRICE / MRP</div>
-                  <div style={{ flex: 1.8 }}>STOCK QUANTITY</div>
-                  <div style={{ flex: 1.8, textAlign: 'center' }}>LIVE AVAILABILITY</div>
-                  <div style={{ flex: 1.2, textAlign: 'right' }}>LOCATION</div>
+              <div className="inventory-table-card">
+                <div className="table-header-grid">
+                  <div>PRODUCT & DETAILS</div>
+                  <div>CATEGORY / ABV</div>
+                  <div>PRICE / MRP</div>
+                  <div>STOCK QUANTITY</div>
+                  <div style={{ textAlign: 'center' }}>LIVE AVAILABILITY</div>
+                  <div style={{ textAlign: 'right' }}>LOCATION</div>
                 </div>
 
                 {filteredProducts.length === 0 ? (
@@ -901,9 +855,9 @@ export default function StorePartnerPortal() {
                     const isOutOfStock = !p.inStock || p.stock === 0;
 
                     return (
-                      <div key={p.id} style={ui.tableDataRow}>
+                      <div key={p.id} className="table-row-grid">
                         {/* Details */}
-                        <div style={{ flex: 3, display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                           <div style={ui.prodThumbBox}>
                             <img src={p.imageUrl} alt={p.name} style={ui.prodThumbImg} />
                             {p.isChilled && <span style={ui.chilledRibbon}>❄️ Chilled</span>}
@@ -917,7 +871,7 @@ export default function StorePartnerPortal() {
                         </div>
 
                         {/* Category */}
-                        <div style={{ flex: 1.5 }}>
+                        <div>
                           <span style={ui.categoryTag}>{p.category.toUpperCase()}</span>
                           <div style={{ fontSize: 12, color: '#64748B', marginTop: 4, fontWeight: 700 }}>
                             ABV: {p.abv}
@@ -925,7 +879,7 @@ export default function StorePartnerPortal() {
                         </div>
 
                         {/* Price */}
-                        <div style={{ flex: 1.5 }}>
+                        <div>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
                             <span style={ui.sellingPriceText}>₹{p.price}</span>
                             <span style={ui.mrpPriceText}>₹{p.mrp}</span>
@@ -934,7 +888,7 @@ export default function StorePartnerPortal() {
                         </div>
 
                         {/* Stock Stepper */}
-                        <div style={{ flex: 1.8 }}>
+                        <div>
                           <div style={ui.stockStepperBox}>
                             <button onClick={() => handleUpdateStockCount(p.id, -1)} style={ui.stepperBtn}>
                               -
@@ -955,7 +909,7 @@ export default function StorePartnerPortal() {
                         </div>
 
                         {/* Availability Toggle */}
-                        <div style={{ flex: 1.8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                           <label style={ui.switchContainer}>
                             <input
                               type="checkbox"
@@ -990,7 +944,7 @@ export default function StorePartnerPortal() {
                         </div>
 
                         {/* Location */}
-                        <div style={{ flex: 1.2, textAlign: 'right' }}>
+                        <div style={{ textAlign: 'right' }}>
                           <span style={ui.rackBadge}>📍 {p.rackLocation}</span>
                         </div>
                       </div>
@@ -1005,8 +959,8 @@ export default function StorePartnerPortal() {
           {/* TAB 2: LIVE ORDERS (BLINKIT STORE POS TERMINAL) */}
           {/* ========================================================================= */}
           {activeTab === 'orders' && (
-            <div style={ui.tabFadeIn}>
-              <div style={ui.pageHeaderRow}>
+            <div>
+              <div className="page-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, gap: 16 }}>
                 <div>
                   <h1 style={ui.pageTitle}>Live Order Dispatch Terminal</h1>
                   <p style={ui.pageSubtitle}>
@@ -1015,28 +969,28 @@ export default function StorePartnerPortal() {
                 </div>
 
                 {/* Sub-status buttons */}
-                <div style={ui.orderStatusSubNav}>
-                  {(['ALL', 'NEW', 'PREPARING', 'READY_PICKUP', 'COMPLETED'] as const).map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => setOrderStatusFilter(st)}
-                      style={{
-                        ...ui.orderStatusNavBtn,
-                        ...(orderStatusFilter === st ? ui.orderStatusNavBtnActive : {}),
-                      }}
-                    >
-                      {st === 'ALL' && 'All Orders'}
-                      {st === 'NEW' && `🚨 New Alert (${orders.filter((o) => o.status === 'NEW').length})`}
-                      {st === 'PREPARING' && `⏳ Picking (${orders.filter((o) => o.status === 'PREPARING').length})`}
-                      {st === 'READY_PICKUP' && `📦 Ready (${orders.filter((o) => o.status === 'READY_PICKUP').length})`}
-                      {st === 'COMPLETED' && '✅ Completed'}
-                    </button>
-                  ))}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {(['ALL', 'NEW', 'PREPARING', 'READY_PICKUP', 'COMPLETED'] as const).map((st) => {
+                    const isSelected = orderStatusFilter === st;
+                    return (
+                      <button
+                        key={st}
+                        onClick={() => setOrderStatusFilter(st)}
+                        className={`filter-btn-pill ${isSelected ? 'active' : ''}`}
+                      >
+                        {st === 'ALL' && 'All Orders'}
+                        {st === 'NEW' && `🚨 New Alert (${orders.filter((o) => o.status === 'NEW').length})`}
+                        {st === 'PREPARING' && `⏳ Picking (${orders.filter((o) => o.status === 'PREPARING').length})`}
+                        {st === 'READY_PICKUP' && `📦 Ready (${orders.filter((o) => o.status === 'READY_PICKUP').length})`}
+                        {st === 'COMPLETED' && '✅ Completed'}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Orders List Grid */}
-              <div style={ui.ordersContainerGrid}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {filteredOrders.length === 0 ? (
                   <div style={ui.emptyView}>
                     <div style={{ fontSize: 44, marginBottom: 12 }}>🎉</div>
@@ -1054,10 +1008,7 @@ export default function StorePartnerPortal() {
                     return (
                       <div
                         key={order.id}
-                        style={{
-                          ...ui.posOrderCard,
-                          ...(isNew ? ui.posOrderCardNew : {}),
-                        }}
+                        className={`order-card-box ${isNew ? 'order-card-new' : ''}`}
                       >
                         {/* Order Header */}
                         <div style={ui.posCardHeader}>
@@ -1079,7 +1030,12 @@ export default function StorePartnerPortal() {
                             )}
                             <span
                               style={{
-                                ...ui.orderStatePill,
+                                display: 'inline-block',
+                                fontSize: 11,
+                                fontWeight: 900,
+                                padding: '4px 10px',
+                                borderRadius: 9999,
+                                letterSpacing: 0.5,
                                 background: isNew ? '#FEF2F2' : isPreparing ? '#FEFCE8' : isReady ? '#E8F7EC' : '#F1F5F9',
                                 color: isNew ? '#DC2626' : isPreparing ? '#B45309' : isReady ? '#0C831F' : '#475569',
                               }}
@@ -1161,7 +1117,7 @@ export default function StorePartnerPortal() {
                             <div style={{ fontSize: 20, fontWeight: 900, color: '#0C831F' }}>₹{order.storeEarnings}</div>
                           </div>
 
-                          <div style={ui.posActionButtons}>
+                          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                             {isNew && (
                               <>
                                 <button onClick={() => handleRejectOrder(order.id)} style={ui.rejectButton}>
@@ -1204,8 +1160,8 @@ export default function StorePartnerPortal() {
           {/* TAB 3: SALES & PAYOUTS VIEW */}
           {/* ========================================================================= */}
           {activeTab === 'reports' && (
-            <div style={ui.tabFadeIn}>
-              <div style={ui.pageHeaderRow}>
+            <div>
+              <div className="page-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, gap: 16 }}>
                 <div>
                   <h1 style={ui.pageTitle}>Sales, Revenue & Payouts</h1>
                   <p style={ui.pageSubtitle}>
@@ -1224,34 +1180,34 @@ export default function StorePartnerPortal() {
               </div>
 
               {/* KPI Cards */}
-              <div style={ui.kpiGrid}>
-                <div style={ui.kpiCard}>
-                  <div style={ui.kpiLabel}>TODAY GROSS GMV</div>
-                  <div style={ui.kpiValue}>₹42,180</div>
-                  <div style={{ ...ui.kpiSub, color: '#10B981', fontWeight: 800 }}>+18.4% vs yesterday</div>
+              <div className="kpi-grid">
+                <div className="kpi-card">
+                  <div className="kpi-label">TODAY GROSS GMV</div>
+                  <div className="kpi-val">₹42,180</div>
+                  <div className="kpi-sub" style={{ color: '#10B981', fontWeight: 800 }}>+18.4% vs yesterday</div>
                 </div>
 
-                <div style={{ ...ui.kpiCard, borderLeft: '4px solid #0C831F' }}>
-                  <div style={ui.kpiLabel}>TODAY NET STORE EARNINGS</div>
-                  <div style={{ ...ui.kpiValue, color: '#0C831F' }}>₹38,805</div>
-                  <div style={ui.kpiSub}>After 8% Drinkit platform commission</div>
+                <div className="kpi-card" style={{ borderLeft: '4px solid #0C831F' }}>
+                  <div className="kpi-label">TODAY NET STORE EARNINGS</div>
+                  <div className="kpi-val" style={{ color: '#0C831F' }}>₹38,805</div>
+                  <div className="kpi-sub">After 8% Drinkit platform commission</div>
                 </div>
 
-                <div style={{ ...ui.kpiCard, borderLeft: '4px solid #3B82F6' }}>
-                  <div style={ui.kpiLabel}>AVG FULFILLMENT SPEED</div>
-                  <div style={{ ...ui.kpiValue, color: '#2563EB' }}>3.8 mins</div>
-                  <div style={ui.kpiSub}>Target &lt; 5 mins (Excellent speed)</div>
+                <div className="kpi-card" style={{ borderLeft: '4px solid #3B82F6' }}>
+                  <div className="kpi-label">AVG FULFILLMENT SPEED</div>
+                  <div className="kpi-val" style={{ color: '#2563EB' }}>3.8 mins</div>
+                  <div className="kpi-sub">Target &lt; 5 mins (Excellent speed)</div>
                 </div>
 
-                <div style={{ ...ui.kpiCard, borderLeft: '4px solid #8B5CF6' }}>
-                  <div style={ui.kpiLabel}>ACCEPTANCE RATE</div>
-                  <div style={{ ...ui.kpiValue, color: '#7C3AED' }}>98.6%</div>
-                  <div style={ui.kpiSub}>42 Accepted / 0 Rejected</div>
+                <div className="kpi-card" style={{ borderLeft: '4px solid #8B5CF6' }}>
+                  <div className="kpi-label">ACCEPTANCE RATE</div>
+                  <div className="kpi-val" style={{ color: '#7C3AED' }}>98.6%</div>
+                  <div className="kpi-sub">42 Accepted / 0 Rejected</div>
                 </div>
               </div>
 
               {/* Charts & Split Layout */}
-              <div style={ui.chartsRow}>
+              <div className="analytics-split-row" style={{ display: 'flex', gap: 20, marginBottom: 24, flexWrap: 'wrap' }}>
                 {/* Category Revenue Breakdown */}
                 <div style={{ ...ui.analyticsBox, flex: 1.2 }}>
                   <h3 style={ui.analyticsBoxTitle}>🍹 Category Revenue Distribution</h3>
@@ -1304,14 +1260,14 @@ export default function StorePartnerPortal() {
               </div>
 
               {/* Settlement History Table */}
-              <div style={ui.tableWrapperCard}>
-                <div style={ui.tableHeadRow}>
-                  <div style={{ flex: 2 }}>SETTLEMENT ID & DATE</div>
-                  <div style={{ flex: 1.5 }}>ORDERS PROCESSED</div>
-                  <div style={{ flex: 1.5 }}>GROSS GMV</div>
-                  <div style={{ flex: 1.5 }}>COMMISSION (8%)</div>
-                  <div style={{ flex: 2 }}>NET SETTLED AMOUNT</div>
-                  <div style={{ flex: 1, textAlign: 'right' }}>STATUS</div>
+              <div className="inventory-table-card">
+                <div className="table-header-grid" style={{ gridTemplateColumns: '2fr 1.5fr 1.5fr 1.5fr 2fr 1fr' }}>
+                  <div>SETTLEMENT ID & DATE</div>
+                  <div>ORDERS PROCESSED</div>
+                  <div>GROSS GMV</div>
+                  <div>COMMISSION (8%)</div>
+                  <div>NET SETTLED AMOUNT</div>
+                  <div style={{ textAlign: 'right' }}>STATUS</div>
                 </div>
 
                 {[
@@ -1320,16 +1276,16 @@ export default function StorePartnerPortal() {
                   { id: 'SETTL-8919', date: '29 Aug', orders: 31, gross: '₹39,800', comm: '₹3,184', net: '₹36,616', status: 'PAID' },
                   { id: 'SETTL-8918', date: '28 Aug', orders: 29, gross: '₹35,100', comm: '₹2,808', net: '₹32,292', status: 'PAID' },
                 ].map((s) => (
-                  <div key={s.id} style={ui.tableDataRow}>
-                    <div style={{ flex: 2 }}>
+                  <div key={s.id} className="table-row-grid" style={{ gridTemplateColumns: '2fr 1.5fr 1.5fr 1.5fr 2fr 1fr' }}>
+                    <div>
                       <div style={{ fontWeight: 800, fontSize: 14 }}>{s.id}</div>
                       <div style={{ fontSize: 12, color: '#64748B' }}>{s.date}</div>
                     </div>
-                    <div style={{ flex: 1.5, fontWeight: 700 }}>{s.orders} Orders</div>
-                    <div style={{ flex: 1.5, fontWeight: 700 }}>{s.gross}</div>
-                    <div style={{ flex: 1.5, color: '#EF4444', fontWeight: 700 }}>- {s.comm}</div>
-                    <div style={{ flex: 2, fontWeight: 900, color: '#0C831F', fontSize: 16 }}>{s.net}</div>
-                    <div style={{ flex: 1, textAlign: 'right' }}>
+                    <div style={{ fontWeight: 700 }}>{s.orders} Orders</div>
+                    <div style={{ fontWeight: 700 }}>{s.gross}</div>
+                    <div style={{ color: '#EF4444', fontWeight: 700 }}>- {s.comm}</div>
+                    <div style={{ fontWeight: 900, color: '#0C831F', fontSize: 16 }}>{s.net}</div>
+                    <div style={{ textAlign: 'right' }}>
                       <span style={ui.settledBadgePill}>✓ {s.status}</span>
                     </div>
                   </div>
@@ -1341,13 +1297,10 @@ export default function StorePartnerPortal() {
       </div>
 
       {/* Sticky Bottom Navigation for Mobile / Tablet */}
-      <div style={ui.mobileBottomBar}>
+      <div className="mobile-bottom-nav">
         <button
           onClick={() => setActiveTab('inventory')}
-          style={{
-            ...ui.bottomTabBtn,
-            ...(activeTab === 'inventory' ? ui.bottomTabBtnActive : {}),
-          }}
+          className={`mobile-nav-btn ${activeTab === 'inventory' ? 'active' : ''}`}
         >
           <span style={{ fontSize: 20 }}>📦</span>
           <span>Inventory</span>
@@ -1355,10 +1308,7 @@ export default function StorePartnerPortal() {
 
         <button
           onClick={() => setActiveTab('orders')}
-          style={{
-            ...ui.bottomTabBtn,
-            ...(activeTab === 'orders' ? ui.bottomTabBtnActive : {}),
-          }}
+          className={`mobile-nav-btn ${activeTab === 'orders' ? 'active' : ''}`}
         >
           <span style={{ fontSize: 20 }}>🔔</span>
           <span>Orders {newOrdersCount > 0 && `(${newOrdersCount})`}</span>
@@ -1366,10 +1316,7 @@ export default function StorePartnerPortal() {
 
         <button
           onClick={() => setActiveTab('reports')}
-          style={{
-            ...ui.bottomTabBtn,
-            ...(activeTab === 'reports' ? ui.bottomTabBtnActive : {}),
-          }}
+          className={`mobile-nav-btn ${activeTab === 'reports' ? 'active' : ''}`}
         >
           <span style={{ fontSize: 20 }}>📊</span>
           <span>Payouts</span>
@@ -1684,16 +1631,9 @@ export default function StorePartnerPortal() {
 }
 
 // -----------------------------------------------------------------------------
-// RESPONSIVE & HIGH-AESTHETIC STYLES
+// COMPONENT STYLES (No shorthand conflicts)
 // -----------------------------------------------------------------------------
 const ui: Record<string, React.CSSProperties> = {
-  wrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh',
-    background: '#F4F6F9',
-    color: '#0F172A',
-  },
   toast: {
     position: 'fixed',
     top: 20,
@@ -1706,36 +1646,6 @@ const ui: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     boxShadow: '0 12px 28px rgba(0,0,0,0.2)',
     zIndex: 99999,
-  },
-  topBar: {
-    height: 64,
-    background: '#FFFFFF',
-    borderBottom: '1px solid #E2E8F0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 24px',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  },
-  topBarLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 16,
-  },
-  mobileMenuBtn: {
-    display: 'none',
-    background: 'none',
-    border: 'none',
-    fontSize: 22,
-    cursor: 'pointer',
-    color: '#0F172A',
-  },
-  brandGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
   },
   brandEmoji: {
     fontSize: 24,
@@ -1770,10 +1680,6 @@ const ui: Record<string, React.CSSProperties> = {
     color: '#64748B',
     fontWeight: 700,
   },
-  topBarCenter: {
-    display: 'flex',
-    alignItems: 'center',
-  },
   liveStatusBadge: {
     display: 'flex',
     alignItems: 'center',
@@ -1797,11 +1703,6 @@ const ui: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     cursor: 'pointer',
     color: '#0F172A',
-  },
-  topBarRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
   },
   clockPill: {
     fontSize: 12,
@@ -1834,72 +1735,19 @@ const ui: Record<string, React.CSSProperties> = {
     fontWeight: 900,
     fontSize: 14,
   },
-  bodyLayout: {
-    display: 'flex',
-    flex: 1,
-    minHeight: 'calc(100vh - 64px)',
-  },
-  sidebar: {
-    width: 260,
-    background: '#FFFFFF',
-    borderRight: '1px solid #E2E8F0',
-    padding: '24px 16px',
-    display: 'flex',
-    flexDirection: 'column',
-    flexShrink: 0,
-  },
-  sidebarMobileOpen: {
-    position: 'fixed',
-    top: 64,
-    left: 0,
-    bottom: 0,
-    zIndex: 999,
-    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-  },
   mobileBackdrop: {
     position: 'fixed',
     inset: 0,
     top: 64,
     background: 'rgba(0,0,0,0.4)',
     zIndex: 998,
-  },
-  sidebarHeader: {
-    padding: '0 8px 12px',
+    display: 'none',
   },
   sidebarSectionTitle: {
     fontSize: 11,
     fontWeight: 900,
     color: '#94A3B8',
     letterSpacing: 1,
-  },
-  sidebarNav: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 6,
-    flex: 1,
-  },
-  sidebarItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: '12px 14px',
-    borderRadius: 12,
-    border: 'none',
-    background: 'transparent',
-    color: '#475569',
-    fontSize: 14,
-    fontWeight: 800,
-    cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'all 0.15s ease',
-  },
-  sidebarItemActive: {
-    background: '#E8F7EC',
-    color: '#0C831F',
-    fontWeight: 900,
-  },
-  sidebarItemIcon: {
-    fontSize: 18,
   },
   sidebarCountPill: {
     fontSize: 12,
@@ -1923,26 +1771,6 @@ const ui: Record<string, React.CSSProperties> = {
     border: '1px solid #E2E8F0',
     borderRadius: 12,
     padding: 12,
-  },
-  contentArea: {
-    flex: 1,
-    padding: '32px 36px',
-    maxWidth: 1400,
-    margin: '0 auto',
-    width: '100%',
-    boxSizing: 'border-box',
-    paddingBottom: 80,
-  },
-  tabFadeIn: {
-    animation: 'fadeIn 0.25s ease-out forwards',
-  },
-  pageHeaderRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 24,
-    gap: 16,
-    flexWrap: 'wrap',
   },
   pageTitle: {
     margin: 0,
@@ -1971,89 +1799,6 @@ const ui: Record<string, React.CSSProperties> = {
     boxShadow: '0 4px 14px rgba(12, 131, 31, 0.3)',
     whiteSpace: 'nowrap',
   },
-  kpiGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: 16,
-    marginBottom: 24,
-  },
-  kpiCard: {
-    background: '#FFFFFF',
-    border: '1px solid #E2E8F0',
-    borderRadius: 16,
-    padding: '18px 20px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-  },
-  kpiLabel: {
-    fontSize: 11,
-    fontWeight: 900,
-    color: '#64748B',
-    letterSpacing: 0.8,
-  },
-  kpiValue: {
-    marginTop: 8,
-    fontSize: 28,
-    fontWeight: 900,
-    color: '#0F172A',
-  },
-  kpiSub: {
-    marginTop: 4,
-    fontSize: 12,
-    color: '#94A3B8',
-  },
-  categoryScrollContainer: {
-    display: 'flex',
-    gap: 10,
-    overflowX: 'auto',
-    paddingBottom: 8,
-    marginBottom: 20,
-  },
-  categoryButton: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    padding: '10px 18px',
-    borderRadius: 9999,
-    border: '1px solid #E2E8F0',
-    background: '#FFFFFF',
-    color: '#475569',
-    fontSize: 13,
-    fontWeight: 800,
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-  },
-  categoryButtonActive: {
-    background: '#0F172A',
-    color: '#FFFFFF',
-    borderColor: '#0F172A',
-  },
-  categoryCountBadge: {
-    fontSize: 11,
-    fontWeight: 900,
-    padding: '2px 8px',
-    borderRadius: 9999,
-  },
-  filterBar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 16,
-    marginBottom: 20,
-    flexWrap: 'wrap',
-  },
-  searchBoxWrapper: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    background: '#FFFFFF',
-    border: '1px solid #CBD5E1',
-    borderRadius: 9999,
-    padding: '0 16px',
-    width: '100%',
-    maxWidth: 420,
-    height: 44,
-  },
   searchBarInput: {
     border: 'none',
     outline: 'none',
@@ -2068,51 +1813,6 @@ const ui: Record<string, React.CSSProperties> = {
     color: '#94A3B8',
     cursor: 'pointer',
     fontSize: 13,
-  },
-  statusFilterPills: {
-    display: 'flex',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
-  filterPillBtn: {
-    padding: '8px 14px',
-    borderRadius: 9999,
-    border: '1px solid #E2E8F0',
-    background: '#FFFFFF',
-    color: '#475569',
-    fontSize: 12,
-    fontWeight: 800,
-    cursor: 'pointer',
-  },
-  filterPillBtnActive: {
-    background: '#E8F7EC',
-    borderColor: '#0C831F',
-    color: '#0C831F',
-    fontWeight: 900,
-  },
-  tableWrapperCard: {
-    background: '#FFFFFF',
-    border: '1px solid #E2E8F0',
-    borderRadius: 16,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-    overflow: 'hidden',
-  },
-  tableHeadRow: {
-    display: 'flex',
-    padding: '16px 24px',
-    background: '#F8FAFC',
-    borderBottom: '1px solid #E2E8F0',
-    fontSize: 11,
-    fontWeight: 900,
-    color: '#64748B',
-    letterSpacing: 0.8,
-  },
-  tableDataRow: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '16px 24px',
-    borderBottom: '1px solid #F1F5F9',
-    transition: 'background 0.15s ease',
   },
   prodThumbBox: {
     position: 'relative',
@@ -2268,44 +1968,6 @@ const ui: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     cursor: 'pointer',
   },
-
-  // Orders Tab
-  orderStatusSubNav: {
-    display: 'flex',
-    gap: 8,
-    flexWrap: 'wrap',
-  },
-  orderStatusNavBtn: {
-    padding: '8px 16px',
-    borderRadius: 9999,
-    border: '1px solid #E2E8F0',
-    background: '#FFFFFF',
-    color: '#475569',
-    fontSize: 13,
-    fontWeight: 800,
-    cursor: 'pointer',
-  },
-  orderStatusNavBtnActive: {
-    background: '#0F172A',
-    color: '#FFFFFF',
-    borderColor: '#0F172A',
-  },
-  ordersContainerGrid: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 16,
-  },
-  posOrderCard: {
-    background: '#FFFFFF',
-    border: '1px solid #E2E8F0',
-    borderRadius: 16,
-    padding: 24,
-    boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-  },
-  posOrderCardNew: {
-    border: '2px solid #EF4444',
-    boxShadow: '0 6px 20px rgba(239, 68, 68, 0.15)',
-  },
   posCardHeader: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -2342,14 +2004,6 @@ const ui: Record<string, React.CSSProperties> = {
     borderRadius: 9999,
     marginBottom: 6,
     display: 'inline-block',
-  },
-  orderStatePill: {
-    display: 'inline-block',
-    fontSize: 11,
-    fontWeight: 900,
-    padding: '4px 10px',
-    borderRadius: 9999,
-    letterSpacing: 0.5,
   },
   pickingChecklistBox: {
     margin: '16px 0',
@@ -2430,11 +2084,6 @@ const ui: Record<string, React.CSSProperties> = {
     gap: 16,
     flexWrap: 'wrap',
   },
-  posActionButtons: {
-    display: 'flex',
-    gap: 10,
-    flexWrap: 'wrap',
-  },
   acceptButton: {
     background: '#0C831F',
     color: '#FFFFFF',
@@ -2476,20 +2125,12 @@ const ui: Record<string, React.CSSProperties> = {
     fontSize: 13,
     cursor: 'pointer',
   },
-
-  // Sales / Reports
   settlementBankBox: {
     background: '#FFFFFF',
     border: '1px solid #E2E8F0',
     borderRadius: 12,
     padding: '12px 18px',
     textAlign: 'right',
-  },
-  chartsRow: {
-    display: 'flex',
-    gap: 20,
-    marginBottom: 24,
-    flexWrap: 'wrap',
   },
   analyticsBox: {
     background: '#FFFFFF',
@@ -2554,39 +2195,6 @@ const ui: Record<string, React.CSSProperties> = {
     padding: '4px 10px',
     borderRadius: 9999,
   },
-
-  // Mobile Bottom Bar
-  mobileBottomBar: {
-    display: 'none',
-    position: 'fixed',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    background: '#FFFFFF',
-    borderTop: '1px solid #E2E8F0',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    zIndex: 90,
-  },
-  bottomTabBtn: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 2,
-    background: 'none',
-    border: 'none',
-    fontSize: 11,
-    fontWeight: 800,
-    color: '#64748B',
-    cursor: 'pointer',
-  },
-  bottomTabBtnActive: {
-    color: '#0C831F',
-    fontWeight: 900,
-  },
-
-  // Modal
   modalOverlay: {
     position: 'fixed',
     inset: 0,
