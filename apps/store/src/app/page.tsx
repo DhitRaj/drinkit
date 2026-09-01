@@ -724,14 +724,14 @@ export default function StorePartnerPortal() {
           {activeTab === 'inventory' && (
             <div>
               {/* Page Title & Main Action */}
-              <div className="page-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, gap: 16 }}>
-                <div>
+              <div className="page-header-flex">
+                <div className="page-header-left">
                   <h1 style={ui.pageTitle}>Inventory & Stock Control</h1>
                   <p style={ui.pageSubtitle}>
                     Real-time drink availability, quick stock increment, and master catalog integration
                   </p>
                 </div>
-                <button onClick={() => setIsAddModalOpen(true)} className="primary-add-btn" style={ui.primaryAddButton}>
+                <button onClick={() => setIsAddModalOpen(true)} className="primary-add-button">
                   <span style={{ fontSize: 18, fontWeight: 900 }}>+</span> Add Product
                 </button>
               </div>
@@ -960,8 +960,8 @@ export default function StorePartnerPortal() {
           {/* ========================================================================= */}
           {activeTab === 'orders' && (
             <div>
-              <div className="page-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, gap: 16 }}>
-                <div>
+              <div className="page-header-flex">
+                <div className="page-header-left">
                   <h1 style={ui.pageTitle}>Live Order Dispatch Terminal</h1>
                   <p style={ui.pageSubtitle}>
                     Accept instant orders, pick bottles from chillers, and dispatch to waiting delivery riders
@@ -1161,8 +1161,8 @@ export default function StorePartnerPortal() {
           {/* ========================================================================= */}
           {activeTab === 'reports' && (
             <div>
-              <div className="page-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, gap: 16 }}>
-                <div>
+              <div className="page-header-flex">
+                <div className="page-header-left">
                   <h1 style={ui.pageTitle}>Sales, Revenue & Payouts</h1>
                   <p style={ui.pageSubtitle}>
                     Daily GMV, net merchant earnings after 8% commission, and automated bank settlements
