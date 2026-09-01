@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { color, space, radius, fontFamily } from '@/lib/tokens';
+import { radius, fontFamily } from '@/lib/tokens';
 
 export type Product = {
   id: string;
@@ -18,6 +18,35 @@ export type Product = {
   isChilled: boolean;
   rackLocation: string;
   imageUrl: string;
+};
+
+export type OrderItem = {
+  name: string;
+  volume: string;
+  quantity: number;
+  price: number;
+  isChilled: boolean;
+  rackLocation: string;
+  imageUrl: string;
+};
+
+export type StoreOrder = {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  placedTime: string;
+  elapsedSec: number;
+  status: 'NEW' | 'PREPARING' | 'READY_PICKUP' | 'DELIVERED' | 'CANCELLED';
+  paymentMode: 'UPI_ONLINE' | 'CARD_ONLINE' | 'COD';
+  totalAmount: number;
+  storeEarnings: number;
+  deliveryPartner?: {
+    name: string;
+    phone: string;
+    vehicle: string;
+    etaMins: number;
+  };
+  items: OrderItem[];
 };
 
 const MASTER_CATALOG: Omit<Product, 'id' | 'price' | 'stock' | 'minThreshold' | 'inStock' | 'rackLocation'>[] = [
@@ -82,16 +111,6 @@ const MASTER_CATALOG: Omit<Product, 'id' | 'price' | 'stock' | 'minThreshold' | 
     imageUrl: 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?auto=format&fit=crop&w=400&q=80',
   },
   {
-    name: 'Royal Challenge Whisky',
-    brand: 'Royal Challenge',
-    category: 'whiskey',
-    volume: '750ml Bottle',
-    abv: '42.8%',
-    mrp: 1120,
-    isChilled: false,
-    imageUrl: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=400&q=80',
-  },
-  {
     name: 'Smirnoff Triple Distilled Vodka',
     brand: 'Smirnoff',
     category: 'vodka',
@@ -102,56 +121,6 @@ const MASTER_CATALOG: Omit<Product, 'id' | 'price' | 'stock' | 'minThreshold' | 
     imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=400&q=80',
   },
   {
-    name: 'Absolut Swedish Premium Vodka',
-    brand: 'Absolut',
-    category: 'vodka',
-    volume: '750ml Bottle',
-    abv: '40%',
-    mrp: 2100,
-    isChilled: true,
-    imageUrl: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Bacardi Carta Blanca White Rum',
-    brand: 'Bacardi',
-    category: 'rum',
-    volume: '750ml Bottle',
-    abv: '40%',
-    mrp: 1400,
-    isChilled: false,
-    imageUrl: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Old Monk The Legend Rum',
-    brand: 'Old Monk',
-    category: 'rum',
-    volume: '750ml Bottle',
-    abv: '42.8%',
-    mrp: 850,
-    isChilled: false,
-    imageUrl: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Bombay Sapphire Botanical Gin',
-    brand: 'Bombay Sapphire',
-    category: 'gin',
-    volume: '750ml Bottle',
-    abv: '47%',
-    mrp: 2750,
-    isChilled: false,
-    imageUrl: 'https://images.unsplash.com/photo-1541544741938-0af808871cc0?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Sula Sauvignon Blanc White Wine',
-    brand: 'Sula Vineyards',
-    category: 'wine',
-    volume: '750ml Bottle',
-    abv: '12.5%',
-    mrp: 999,
-    isChilled: true,
-    imageUrl: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=400&q=80',
-  },
-  {
     name: 'Schweppes Tonic Water (Pack of 4)',
     brand: 'Schweppes',
     category: 'mixers',
@@ -160,26 +129,6 @@ const MASTER_CATALOG: Omit<Product, 'id' | 'price' | 'stock' | 'minThreshold' | 
     mrp: 240,
     isChilled: true,
     imageUrl: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Gourmet Salted Roasted Cashews',
-    brand: 'Nutty Gritties',
-    category: 'snacks',
-    volume: '200g Pack',
-    abv: '0%',
-    mrp: 320,
-    isChilled: false,
-    imageUrl: 'https://images.unsplash.com/photo-1599599810769-bcde5a160d32?auto=format&fit=crop&w=400&q=80',
-  },
-  {
-    name: 'Party Ice Cubes Bag',
-    brand: 'ClearIce',
-    category: 'ice',
-    volume: '2 Kg Bag',
-    abv: '0%',
-    mrp: 120,
-    isChilled: true,
-    imageUrl: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=400&q=80',
   },
 ];
 
@@ -282,6 +231,111 @@ const INITIAL_STORE_PRODUCTS: Product[] = [
   },
 ];
 
+const INITIAL_ORDERS: StoreOrder[] = [
+  {
+    id: 'DK-1048',
+    customerName: 'Rahul Verma',
+    customerPhone: '+91 98765 43210',
+    placedTime: '1 min ago',
+    elapsedSec: 48,
+    status: 'NEW',
+    paymentMode: 'UPI_ONLINE',
+    totalAmount: 1180,
+    storeEarnings: 1085,
+    deliveryPartner: {
+      name: 'Amit Kumar (Blinkit Rider)',
+      phone: '+91 99887 76655',
+      vehicle: 'Hero Electric (KA-01-EQ-9012)',
+      etaMins: 4,
+    },
+    items: [
+      {
+        name: 'Kingfisher Premium Lager Beer',
+        volume: '330ml Can',
+        quantity: 4,
+        price: 65,
+        isChilled: true,
+        rackLocation: 'Chiller-1',
+        imageUrl: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=400&q=80',
+      },
+      {
+        name: 'Schweppes Tonic Water (Pack of 4)',
+        volume: '4 x 250ml',
+        quantity: 1,
+        price: 199,
+        isChilled: true,
+        rackLocation: 'Chiller-4',
+        imageUrl: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?auto=format&fit=crop&w=400&q=80',
+      },
+    ],
+  },
+  {
+    id: 'DK-1045',
+    customerName: 'Priya Sharma',
+    customerPhone: '+91 98111 22334',
+    placedTime: '4 min ago',
+    elapsedSec: 240,
+    status: 'PREPARING',
+    paymentMode: 'UPI_ONLINE',
+    totalAmount: 2499,
+    storeEarnings: 2299,
+    deliveryPartner: {
+      name: 'Vikas Rao (Blinkit Rider)',
+      phone: '+91 97711 33445',
+      vehicle: 'Honda Activa (KA-05-MK-4421)',
+      etaMins: 2,
+    },
+    items: [
+      {
+        name: 'Johnnie Walker Black Label 12YR',
+        volume: '750ml Bottle',
+        quantity: 1,
+        price: 1999,
+        isChilled: false,
+        rackLocation: 'Rack A-4',
+        imageUrl: 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?auto=format&fit=crop&w=400&q=80',
+      },
+    ],
+  },
+  {
+    id: 'DK-1042',
+    customerName: 'Ankit Mehta',
+    customerPhone: '+91 97123 45678',
+    placedTime: '8 min ago',
+    elapsedSec: 480,
+    status: 'READY_PICKUP',
+    paymentMode: 'CARD_ONLINE',
+    totalAmount: 1850,
+    storeEarnings: 1702,
+    deliveryPartner: {
+      name: 'Deepak Singh (Blinkit Rider)',
+      phone: '+91 96554 11223',
+      vehicle: 'Ather 450X (KA-03-JJ-7788)',
+      etaMins: 1,
+    },
+    items: [
+      {
+        name: 'Budweiser Magnum Strong Beer',
+        volume: '650ml Bottle',
+        quantity: 3,
+        price: 120,
+        isChilled: true,
+        rackLocation: 'Chiller-2',
+        imageUrl: 'https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=400&q=80',
+      },
+      {
+        name: 'Corona Extra Imported Beer',
+        volume: '355ml Pint',
+        quantity: 2,
+        price: 210,
+        isChilled: true,
+        rackLocation: 'Chiller-3',
+        imageUrl: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=400&q=80',
+      },
+    ],
+  },
+];
+
 const CATEGORIES = [
   { id: 'all', label: 'All Items', icon: '🛒' },
   { id: 'beer', label: 'Beer', icon: '🍺' },
@@ -301,6 +355,8 @@ export default function StoreDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [stockFilter, setStockFilter] = useState<'all' | 'in_stock' | 'low_stock' | 'out_of_stock'>('all');
   const [products, setProducts] = useState<Product[]>(INITIAL_STORE_PRODUCTS);
+  const [orders, setOrders] = useState<StoreOrder[]>(INITIAL_ORDERS);
+  const [orderStatusFilter, setOrderStatusFilter] = useState<'ALL' | 'NEW' | 'PREPARING' | 'READY_PICKUP' | 'COMPLETED'>('ALL');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Add Product Modal States
@@ -330,7 +386,36 @@ export default function StoreDashboard() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Toggle In-Stock status in 1-click (Blinkit store partner style)
+  // Order Actions
+  const handleAcceptOrder = (orderId: string) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: 'PREPARING' } : o))
+    );
+    showToast(`🔔 Order ${orderId} Accepted! Start picking bottles.`);
+  };
+
+  const handleMarkReady = (orderId: string) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: 'READY_PICKUP' } : o))
+    );
+    showToast(`✅ Order ${orderId} Packed & Ready for Rider Pickup!`);
+  };
+
+  const handleHandoverToRider = (orderId: string) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: 'DELIVERED' } : o))
+    );
+    showToast(`🛵 Handed over to Delivery Rider for ${orderId}`);
+  };
+
+  const handleRejectOrder = (orderId: string) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: 'CANCELLED' } : o))
+    );
+    showToast(`❌ Order ${orderId} rejected.`);
+  };
+
+  // Toggle In-Stock status
   const handleToggleStock = (id: string) => {
     setProducts((prev) =>
       prev.map((p) => {
@@ -432,6 +517,19 @@ export default function StoreDashboard() {
     });
   }, [products, selectedCategory, searchQuery, stockFilter]);
 
+  // Filtered Orders
+  const filteredOrders = useMemo(() => {
+    return orders.filter((o) => {
+      if (orderStatusFilter === 'ALL') return true;
+      if (orderStatusFilter === 'COMPLETED') return o.status === 'DELIVERED';
+      return o.status === orderStatusFilter;
+    });
+  }, [orders, orderStatusFilter]);
+
+  const newOrdersCount = useMemo(() => {
+    return orders.filter((o) => o.status === 'NEW').length;
+  }, [orders]);
+
   // Catalog filtered for Master search
   const filteredCatalog = useMemo(() => {
     return MASTER_CATALOG.filter(
@@ -476,7 +574,7 @@ export default function StoreDashboard() {
             onClick={() => setActiveTab('orders')}
             style={{ ...styles.navItem, ...(activeTab === 'orders' ? styles.navActive : {}) }}
           >
-            🔔 Live Orders <span style={styles.badgeCount}>3</span>
+            🔔 Live Orders {newOrdersCount > 0 && <span style={styles.badgeCount}>{newOrdersCount}</span>}
           </button>
           <button
             onClick={() => setActiveTab('reports')}
@@ -487,7 +585,7 @@ export default function StoreDashboard() {
         </nav>
 
         <div style={styles.storeCard}>
-          <div style={styles.storeCardTitle}>🏪 Store Live Status</div>
+          <div style={styles.storeCardTitle}>🏪 STORE ACTIVE</div>
           <div style={styles.storeCardSubtitle}>Koramangala Wine Cellar</div>
           <div style={styles.statusOnline}>● Accepting Orders (Live)</div>
         </div>
@@ -495,231 +593,557 @@ export default function StoreDashboard() {
 
       {/* Main Content Area */}
       <main style={styles.main}>
-        {/* Header Bar */}
-        <header style={styles.header}>
+        {/* ========================================================================= */}
+        {/* TAB 1: INVENTORY & CATALOG */}
+        {/* ========================================================================= */}
+        {activeTab === 'inventory' && (
           <div>
-            <div style={styles.eyebrow}>BLINKIT STORE PARTNER PORTAL</div>
-            <h1 style={styles.h1}>Product & Inventory Manager</h1>
-            <p style={styles.subtext}>Manage stock levels, drink catalog, pricing, and 1-click availability</p>
-          </div>
-
-          <div style={styles.headerActions}>
-            <button onClick={() => setIsAddModalOpen(true)} style={styles.primaryAddBtn}>
-              <span style={{ fontSize: 18, fontWeight: 900 }}>+</span> Add Product
-            </button>
-          </div>
-        </header>
-
-        {/* Stats Overview */}
-        <section style={styles.statsGrid}>
-          <div style={styles.statCard}>
-            <div style={styles.statLabel}>Total SKUs in Store</div>
-            <div style={styles.statValue}>{stats.total}</div>
-            <div style={styles.statSub}>Configured in catalog</div>
-          </div>
-          <div style={{ ...styles.statCard, borderLeft: '4px solid #0C831F' }}>
-            <div style={styles.statLabel}>Active & Live in App</div>
-            <div style={{ ...styles.statValue, color: '#0C831F' }}>{stats.active}</div>
-            <div style={styles.statSub}>Available for instant ordering</div>
-          </div>
-          <div style={{ ...styles.statCard, borderLeft: '4px solid #EAB308' }}>
-            <div style={styles.statLabel}>Low Stock Alert</div>
-            <div style={{ ...styles.statValue, color: '#CA8A04' }}>{stats.lowStock}</div>
-            <div style={styles.statSub}>Below threshold alert</div>
-          </div>
-          <div style={{ ...styles.statCard, borderLeft: '4px solid #EF4444' }}>
-            <div style={styles.statLabel}>Out of Stock</div>
-            <div style={{ ...styles.statValue, color: '#EF4444' }}>{stats.outStock}</div>
-            <div style={styles.statSub}>Hidden from customers</div>
-          </div>
-        </section>
-
-        {/* Categories Carousel Filter */}
-        <div style={styles.categoryFilterContainer}>
-          <div style={styles.categoryPills}>
-            {CATEGORIES.map((cat) => {
-              const isSelected = selectedCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  style={{
-                    ...styles.categoryPill,
-                    ...(isSelected ? styles.categoryPillActive : {}),
-                  }}
-                >
-                  <span style={{ fontSize: 16 }}>{cat.icon}</span>
-                  <span>{cat.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Search & Stock Filter Bar */}
-        <div style={styles.toolbar}>
-          <div style={styles.searchWrapper}>
-            <span style={styles.searchIcon}>🔍</span>
-            <input
-              type="text"
-              placeholder="Search by drink name, brand, or shelf rack..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={styles.searchInput}
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery('')} style={styles.clearSearch}>
-                ✕
-              </button>
-            )}
-          </div>
-
-          <div style={styles.filterGroup}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#666' }}>Filter:</span>
-            {(['all', 'in_stock', 'low_stock', 'out_of_stock'] as const).map((filterKey) => (
-              <button
-                key={filterKey}
-                onClick={() => setStockFilter(filterKey)}
-                style={{
-                  ...styles.filterBtn,
-                  ...(stockFilter === filterKey ? styles.filterBtnActive : {}),
-                }}
-              >
-                {filterKey === 'all' && 'All'}
-                {filterKey === 'in_stock' && 'In Stock'}
-                {filterKey === 'low_stock' && '⚠️ Low Stock'}
-                {filterKey === 'out_of_stock' && '❌ Out of Stock'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Products Table / Grid View */}
-        <div style={styles.tableCard}>
-          <div style={styles.tableHeader}>
-            <div style={{ flex: 3 }}>PRODUCT DETAILS</div>
-            <div style={{ flex: 1.5 }}>CATEGORY & ABV</div>
-            <div style={{ flex: 1.5 }}>PRICE / MRP</div>
-            <div style={{ flex: 1.5 }}>CURRENT STOCK</div>
-            <div style={{ flex: 1.5, textAlign: 'center' }}>LIVE AVAILABILITY</div>
-            <div style={{ flex: 1, textAlign: 'right' }}>LOCATION</div>
-          </div>
-
-          {filteredProducts.length === 0 ? (
-            <div style={styles.emptyState}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-              <div style={{ fontWeight: 800, fontSize: 18, color: '#1C1C1C' }}>No products found</div>
-              <div style={{ color: '#777', fontSize: 14, marginTop: 4 }}>
-                Try searching for a different keyword or click "+ Add Product" to add new inventory.
+            {/* Header Bar */}
+            <header style={styles.header}>
+              <div>
+                <div style={styles.eyebrow}>STORE INVENTORY & CATALOG</div>
+                <h1 style={styles.h1}>Manage Drinks & Stock Levels</h1>
+                <p style={styles.subtext}>Category-wise catalog, 1-click availability toggles, and live price management</p>
               </div>
-              <button onClick={() => setIsAddModalOpen(true)} style={styles.emptyAddBtn}>
-                + Add New Drink
-              </button>
-            </div>
-          ) : (
-            filteredProducts.map((p) => {
-              const discount = Math.round(((p.mrp - p.price) / p.mrp) * 100);
-              const isLowStock = p.stock > 0 && p.stock <= p.minThreshold;
-              const isOutOfStock = !p.inStock || p.stock === 0;
 
-              return (
-                <div key={p.id} style={styles.tableRow}>
-                  {/* Product Details */}
-                  <div style={{ flex: 3, display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div style={styles.imgWrapper}>
-                      <img src={p.imageUrl} alt={p.name} style={styles.prodImg} />
-                      {p.isChilled && <span style={styles.chilledTag}>❄️ Chilled</span>}
-                    </div>
-                    <div>
-                      <div style={styles.prodName}>{p.name}</div>
-                      <div style={styles.prodBrand}>
-                        Brand: <span style={{ color: '#1C1C1C', fontWeight: 700 }}>{p.brand}</span> · {p.volume}
-                      </div>
-                    </div>
-                  </div>
+              <div style={styles.headerActions}>
+                <button onClick={() => setIsAddModalOpen(true)} style={styles.primaryAddBtn}>
+                  <span style={{ fontSize: 18, fontWeight: 900 }}>+</span> Add Product
+                </button>
+              </div>
+            </header>
 
-                  {/* Category & ABV */}
-                  <div style={{ flex: 1.5 }}>
-                    <span style={styles.categoryBadge}>{p.category.toUpperCase()}</span>
-                    <div style={{ fontSize: 12, color: '#666', marginTop: 4, fontWeight: 600 }}>
-                      ABV: {p.abv}
-                    </div>
-                  </div>
+            {/* Stats Overview */}
+            <section style={styles.statsGrid}>
+              <div style={styles.statCard}>
+                <div style={styles.statLabel}>Total SKUs in Store</div>
+                <div style={styles.statValue}>{stats.total}</div>
+                <div style={styles.statSub}>Configured in catalog</div>
+              </div>
+              <div style={{ ...styles.statCard, borderLeft: '4px solid #0C831F' }}>
+                <div style={styles.statLabel}>Active & Live in App</div>
+                <div style={{ ...styles.statValue, color: '#0C831F' }}>{stats.active}</div>
+                <div style={styles.statSub}>Available for instant ordering</div>
+              </div>
+              <div style={{ ...styles.statCard, borderLeft: '4px solid #EAB308' }}>
+                <div style={styles.statLabel}>Low Stock Alert</div>
+                <div style={{ ...styles.statValue, color: '#CA8A04' }}>{stats.lowStock}</div>
+                <div style={styles.statSub}>Below threshold alert</div>
+              </div>
+              <div style={{ ...styles.statCard, borderLeft: '4px solid #EF4444' }}>
+                <div style={styles.statLabel}>Out of Stock</div>
+                <div style={{ ...styles.statValue, color: '#EF4444' }}>{stats.outStock}</div>
+                <div style={styles.statSub}>Hidden from customers</div>
+              </div>
+            </section>
 
-                  {/* Price */}
-                  <div style={{ flex: 1.5 }}>
-                    <div style={styles.priceRow}>
-                      <span style={styles.sellingPrice}>₹{p.price}</span>
-                      <span style={styles.mrpPrice}>₹{p.mrp}</span>
-                    </div>
-                    {discount > 0 && <span style={styles.discountBadge}>{discount}% OFF</span>}
-                  </div>
-
-                  {/* Stock Stepper */}
-                  <div style={{ flex: 1.5 }}>
-                    <div style={styles.stockStepper}>
-                      <button onClick={() => handleUpdateStockCount(p.id, -1)} style={styles.stepBtn}>
-                        -
-                      </button>
-                      <span
-                        style={{
-                          ...styles.stockCount,
-                          color: isOutOfStock ? '#EF4444' : isLowStock ? '#CA8A04' : '#0C831F',
-                        }}
-                      >
-                        {p.stock}
-                      </span>
-                      <button onClick={() => handleUpdateStockCount(p.id, 5)} style={styles.stepBtn}>
-                        +5
-                      </button>
-                    </div>
-                    {isLowStock && <div style={styles.lowStockWarning}>⚠️ Low Stock (≤{p.minThreshold})</div>}
-                  </div>
-
-                  {/* 1-Click Availability Toggle */}
-                  <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <label style={styles.switchLabel}>
-                      <input
-                        type="checkbox"
-                        checked={p.inStock && p.stock > 0}
-                        onChange={() => handleToggleStock(p.id)}
-                        style={styles.switchInput}
-                      />
-                      <span
-                        style={{
-                          ...styles.switchSlider,
-                          background: p.inStock && p.stock > 0 ? '#0C831F' : '#D1D5DB',
-                        }}
-                      >
-                        <span
-                          style={{
-                            ...styles.switchKnob,
-                            transform: p.inStock && p.stock > 0 ? 'translateX(20px)' : 'translateX(0px)',
-                          }}
-                        />
-                      </span>
-                    </label>
-                    <span
+            {/* Categories Carousel Filter */}
+            <div style={styles.categoryFilterContainer}>
+              <div style={styles.categoryPills}>
+                {CATEGORIES.map((cat) => {
+                  const isSelected = selectedCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
                       style={{
-                        fontSize: 11,
-                        fontWeight: 800,
-                        marginTop: 4,
-                        color: p.inStock && p.stock > 0 ? '#0C831F' : '#9CA3AF',
+                        ...styles.categoryPill,
+                        ...(isSelected ? styles.categoryPillActive : {}),
                       }}
                     >
-                      {p.inStock && p.stock > 0 ? 'IN STOCK' : 'DISABLED'}
-                    </span>
-                  </div>
+                      <span style={{ fontSize: 16 }}>{cat.icon}</span>
+                      <span>{cat.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-                  {/* Shelf Location */}
-                  <div style={{ flex: 1, textAlign: 'right' }}>
-                    <span style={styles.rackPill}>📍 {p.rackLocation}</span>
+            {/* Search & Stock Filter Bar */}
+            <div style={styles.toolbar}>
+              <div style={styles.searchWrapper}>
+                <span style={styles.searchIcon}>🔍</span>
+                <input
+                  type="text"
+                  placeholder="Search by drink name, brand, or shelf rack..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={styles.searchInput}
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} style={styles.clearSearch}>
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <div style={styles.filterGroup}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#666' }}>Filter:</span>
+                {(['all', 'in_stock', 'low_stock', 'out_of_stock'] as const).map((filterKey) => (
+                  <button
+                    key={filterKey}
+                    onClick={() => setStockFilter(filterKey)}
+                    style={{
+                      ...styles.filterBtn,
+                      ...(stockFilter === filterKey ? styles.filterBtnActive : {}),
+                    }}
+                  >
+                    {filterKey === 'all' && 'All'}
+                    {filterKey === 'in_stock' && 'In Stock'}
+                    {filterKey === 'low_stock' && '⚠️ Low Stock'}
+                    {filterKey === 'out_of_stock' && '❌ Out of Stock'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Products Table */}
+            <div style={styles.tableCard}>
+              <div style={styles.tableHeader}>
+                <div style={{ flex: 3 }}>PRODUCT DETAILS</div>
+                <div style={{ flex: 1.5 }}>CATEGORY & ABV</div>
+                <div style={{ flex: 1.5 }}>PRICE / MRP</div>
+                <div style={{ flex: 1.5 }}>CURRENT STOCK</div>
+                <div style={{ flex: 1.5, textAlign: 'center' }}>LIVE AVAILABILITY</div>
+                <div style={{ flex: 1, textAlign: 'right' }}>LOCATION</div>
+              </div>
+
+              {filteredProducts.length === 0 ? (
+                <div style={styles.emptyState}>
+                  <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
+                  <div style={{ fontWeight: 800, fontSize: 18, color: '#1C1C1C' }}>No products found</div>
+                  <div style={{ color: '#777', fontSize: 14, marginTop: 4 }}>
+                    Try searching for a different keyword or click "+ Add Product" to add new inventory.
+                  </div>
+                  <button onClick={() => setIsAddModalOpen(true)} style={styles.emptyAddBtn}>
+                    + Add New Drink
+                  </button>
+                </div>
+              ) : (
+                filteredProducts.map((p) => {
+                  const discount = Math.round(((p.mrp - p.price) / p.mrp) * 100);
+                  const isLowStock = p.stock > 0 && p.stock <= p.minThreshold;
+                  const isOutOfStock = !p.inStock || p.stock === 0;
+
+                  return (
+                    <div key={p.id} style={styles.tableRow}>
+                      {/* Product Details */}
+                      <div style={{ flex: 3, display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <div style={styles.imgWrapper}>
+                          <img src={p.imageUrl} alt={p.name} style={styles.prodImg} />
+                          {p.isChilled && <span style={styles.chilledTag}>❄️ Chilled</span>}
+                        </div>
+                        <div>
+                          <div style={styles.prodName}>{p.name}</div>
+                          <div style={styles.prodBrand}>
+                            Brand: <span style={{ color: '#1C1C1C', fontWeight: 700 }}>{p.brand}</span> · {p.volume}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Category & ABV */}
+                      <div style={{ flex: 1.5 }}>
+                        <span style={styles.categoryBadge}>{p.category.toUpperCase()}</span>
+                        <div style={{ fontSize: 12, color: '#666', marginTop: 4, fontWeight: 600 }}>
+                          ABV: {p.abv}
+                        </div>
+                      </div>
+
+                      {/* Price */}
+                      <div style={{ flex: 1.5 }}>
+                        <div style={styles.priceRow}>
+                          <span style={styles.sellingPrice}>₹{p.price}</span>
+                          <span style={styles.mrpPrice}>₹{p.mrp}</span>
+                        </div>
+                        {discount > 0 && <span style={styles.discountBadge}>{discount}% OFF</span>}
+                      </div>
+
+                      {/* Stock Stepper */}
+                      <div style={{ flex: 1.5 }}>
+                        <div style={styles.stockStepper}>
+                          <button onClick={() => handleUpdateStockCount(p.id, -1)} style={styles.stepBtn}>
+                            -
+                          </button>
+                          <span
+                            style={{
+                              ...styles.stockCount,
+                              color: isOutOfStock ? '#EF4444' : isLowStock ? '#CA8A04' : '#0C831F',
+                            }}
+                          >
+                            {p.stock}
+                          </span>
+                          <button onClick={() => handleUpdateStockCount(p.id, 5)} style={styles.stepBtn}>
+                            +5
+                          </button>
+                        </div>
+                        {isLowStock && <div style={styles.lowStockWarning}>⚠️ Low Stock (≤{p.minThreshold})</div>}
+                      </div>
+
+                      {/* 1-Click Availability Toggle */}
+                      <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <label style={styles.switchLabel}>
+                          <input
+                            type="checkbox"
+                            checked={p.inStock && p.stock > 0}
+                            onChange={() => handleToggleStock(p.id)}
+                            style={styles.switchInput}
+                          />
+                          <span
+                            style={{
+                              ...styles.switchSlider,
+                              background: p.inStock && p.stock > 0 ? '#0C831F' : '#D1D5DB',
+                            }}
+                          >
+                            <span
+                              style={{
+                                ...styles.switchKnob,
+                                transform: p.inStock && p.stock > 0 ? 'translateX(20px)' : 'translateX(0px)',
+                              }}
+                            />
+                          </span>
+                        </label>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 800,
+                            marginTop: 4,
+                            color: p.inStock && p.stock > 0 ? '#0C831F' : '#9CA3AF',
+                          }}
+                        >
+                          {p.inStock && p.stock > 0 ? 'IN STOCK' : 'DISABLED'}
+                        </span>
+                      </div>
+
+                      {/* Shelf Location */}
+                      <div style={{ flex: 1, textAlign: 'right' }}>
+                        <span style={styles.rackPill}>📍 {p.rackLocation}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 2: LIVE ORDERS (BLINKIT STORE POS TERMINAL) */}
+        {/* ========================================================================= */}
+        {activeTab === 'orders' && (
+          <div>
+            <header style={styles.header}>
+              <div>
+                <div style={styles.eyebrow}>REAL-TIME ORDER DISPATCH TERMINAL</div>
+                <h1 style={styles.h1}>Live Incoming & Active Orders</h1>
+                <p style={styles.subtext}>Accept incoming orders, pick chilled bottles from racks, and hand over to delivery rider</p>
+              </div>
+
+              <div style={styles.orderStatusPills}>
+                {(['ALL', 'NEW', 'PREPARING', 'READY_PICKUP', 'COMPLETED'] as const).map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setOrderStatusFilter(st)}
+                    style={{
+                      ...styles.orderFilterBtn,
+                      ...(orderStatusFilter === st ? styles.orderFilterBtnActive : {}),
+                    }}
+                  >
+                    {st === 'ALL' && 'All Orders'}
+                    {st === 'NEW' && `🚨 New (${orders.filter((o) => o.status === 'NEW').length})`}
+                    {st === 'PREPARING' && `⏳ Preparing (${orders.filter((o) => o.status === 'PREPARING').length})`}
+                    {st === 'READY_PICKUP' && `📦 Ready for Pickup (${orders.filter((o) => o.status === 'READY_PICKUP').length})`}
+                    {st === 'COMPLETED' && '✅ Completed'}
+                  </button>
+                ))}
+              </div>
+            </header>
+
+            {/* Orders Feed Grid */}
+            <div style={styles.ordersGrid}>
+              {filteredOrders.length === 0 ? (
+                <div style={styles.emptyOrderBox}>
+                  <div style={{ fontSize: 44, marginBottom: 12 }}>🎉</div>
+                  <div style={{ fontWeight: 800, fontSize: 18 }}>No orders in this queue</div>
+                  <div style={{ color: '#666', fontSize: 14, marginTop: 4 }}>
+                    New orders placed by customers will ring here in real-time.
                   </div>
                 </div>
-              );
-            })
-          )}
-        </div>
+              ) : (
+                filteredOrders.map((order) => {
+                  const isNew = order.status === 'NEW';
+                  const isPreparing = order.status === 'PREPARING';
+                  const isReady = order.status === 'READY_PICKUP';
+
+                  return (
+                    <div
+                      key={order.id}
+                      style={{
+                        ...styles.orderCard,
+                        ...(isNew ? styles.orderCardNew : {}),
+                      }}
+                    >
+                      {/* Order Card Header */}
+                      <div style={styles.orderCardHeader}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={styles.orderIdBadge}>{order.id}</span>
+                            <span style={styles.paymentPill}>💳 {order.paymentMode.replace('_', ' ')}</span>
+                          </div>
+                          <div style={styles.orderCustomerMeta}>
+                            Customer: <strong style={{ color: '#1C1C1C' }}>{order.customerName}</strong> ({order.customerPhone})
+                          </div>
+                        </div>
+
+                        <div style={{ textAlign: 'right' }}>
+                          <span
+                            style={{
+                              ...styles.statusBadge,
+                              background:
+                                isNew
+                                  ? '#FEF2F2'
+                                  : isPreparing
+                                  ? '#FEFCE8'
+                                  : isReady
+                                  ? '#E8F7EC'
+                                  : '#F3F4F6',
+                              color:
+                                isNew
+                                  ? '#DC2626'
+                                  : isPreparing
+                                  ? '#CA8A04'
+                                  : isReady
+                                  ? '#0C831F'
+                                  : '#4B5563',
+                            }}
+                          >
+                            {order.status === 'NEW' && '🚨 NEW ORDER (ACCEPT)'}
+                            {order.status === 'PREPARING' && '⏳ PACKING IN PROGRESS'}
+                            {order.status === 'READY_PICKUP' && '🛵 RIDER ARRIVING'}
+                            {order.status === 'DELIVERED' && '✅ DELIVERED'}
+                          </span>
+                          <div style={{ fontSize: 11, color: '#6B7280', marginTop: 4 }}>{order.placedTime}</div>
+                        </div>
+                      </div>
+
+                      {/* Items Picking Checklist */}
+                      <div style={styles.itemsBox}>
+                        <div style={styles.itemsBoxTitle}>BOTTLE PICKING CHECKLIST ({order.items.length} ITEMS):</div>
+                        {order.items.map((it, idx) => (
+                          <div key={idx} style={styles.orderItemRow}>
+                            <img src={it.imageUrl} alt={it.name} style={styles.orderItemThumb} />
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontWeight: 800, fontSize: 14, color: '#111827' }}>
+                                {it.quantity}x {it.name}
+                              </div>
+                              <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>
+                                {it.volume} · Location: <strong style={{ color: '#0C831F' }}>{it.rackLocation}</strong>
+                              </div>
+                            </div>
+                            <div>
+                              {it.isChilled && <span style={styles.chilledItemBadge}>❄️ Chill Pack</span>}
+                              <div style={{ fontWeight: 800, fontSize: 14, textAlign: 'right', marginTop: 2 }}>
+                                ₹{it.price * it.quantity}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Rider & Delivery Info */}
+                      {order.deliveryPartner && (
+                        <div style={styles.riderBar}>
+                          <div style={{ fontSize: 18 }}>🛵</div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 12, fontWeight: 800, color: '#111827' }}>
+                              {order.deliveryPartner.name}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#6B7280' }}>
+                              {order.deliveryPartner.vehicle} · ETA {order.deliveryPartner.etaMins} mins
+                            </div>
+                          </div>
+                          <div style={styles.riderPhone}>{order.deliveryPartner.phone}</div>
+                        </div>
+                      )}
+
+                      {/* Order Card Footer / Actions */}
+                      <div style={styles.orderCardFooter}>
+                        <div>
+                          <div style={{ fontSize: 11, color: '#6B7280', fontWeight: 700 }}>YOUR STORE PAYOUT:</div>
+                          <div style={{ fontSize: 18, fontWeight: 900, color: '#0C831F' }}>₹{order.storeEarnings}</div>
+                        </div>
+
+                        <div style={styles.orderActionsGroup}>
+                          {isNew && (
+                            <>
+                              <button onClick={() => handleRejectOrder(order.id)} style={styles.orderRejectBtn}>
+                                Reject
+                              </button>
+                              <button onClick={() => handleAcceptOrder(order.id)} style={styles.orderAcceptBtn}>
+                                Accept Order (2 min)
+                              </button>
+                            </>
+                          )}
+
+                          {isPreparing && (
+                            <button onClick={() => handleMarkReady(order.id)} style={styles.orderPackReadyBtn}>
+                              ✅ Mark Packed & Ready for Pickup
+                            </button>
+                          )}
+
+                          {isReady && (
+                            <button onClick={() => handleHandoverToRider(order.id)} style={styles.orderHandoverBtn}>
+                              🤝 Handover to Rider & Complete
+                            </button>
+                          )}
+
+                          {order.status === 'DELIVERED' && (
+                            <span style={{ fontSize: 13, fontWeight: 800, color: '#0C831F' }}>
+                              🎉 Order Completed Successfully
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 3: SALES & PAYOUTS (FINANCIALS & ANALYTICS) */}
+        {/* ========================================================================= */}
+        {activeTab === 'reports' && (
+          <div>
+            <header style={styles.header}>
+              <div>
+                <div style={styles.eyebrow}>MERCHANT FINANCIALS & SETTLEMENTS</div>
+                <h1 style={styles.h1}>Store Sales, Revenue & Payouts</h1>
+                <p style={styles.subtext}>Daily GMV, net merchant earnings, category split, and automated bank settlements</p>
+              </div>
+              <div style={styles.bankCard}>
+                <div style={{ fontSize: 11, color: '#6B7280', fontWeight: 800 }}>LINKED SETTLEMENT BANK</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#111827', marginTop: 2 }}>
+                  🏦 HDFC Bank Ltd (**** 4892)
+                </div>
+                <div style={{ fontSize: 11, color: '#0C831F', fontWeight: 700, marginTop: 2 }}>
+                  ● Daily Auto-Settlement at 11:59 PM
+                </div>
+              </div>
+            </header>
+
+            {/* Financial Overview Cards */}
+            <section style={styles.statsGrid}>
+              <div style={styles.statCard}>
+                <div style={styles.statLabel}>Today Gross Revenue (GMV)</div>
+                <div style={styles.statValue}>₹42,180</div>
+                <div style={{ ...styles.statSub, color: '#0C831F', fontWeight: 700 }}>+18.4% vs yesterday</div>
+              </div>
+              <div style={{ ...styles.statCard, borderLeft: '4px solid #0C831F' }}>
+                <div style={styles.statLabel}>Today Net Store Payout</div>
+                <div style={{ ...styles.statValue, color: '#0C831F' }}>₹38,805</div>
+                <div style={styles.statSub}>After 8% Drinkit platform commission</div>
+              </div>
+              <div style={{ ...styles.statCard, borderLeft: '4px solid #3B82F6' }}>
+                <div style={styles.statLabel}>Avg Fulfillment Speed</div>
+                <div style={{ ...styles.statValue, color: '#2563EB' }}>3.8 mins</div>
+                <div style={styles.statSub}>Packing & Handover time (Target &lt; 5m)</div>
+              </div>
+              <div style={{ ...styles.statCard, borderLeft: '4px solid #8B5CF6' }}>
+                <div style={styles.statLabel}>Order Acceptance Rate</div>
+                <div style={{ ...styles.statValue, color: '#7C3AED' }}>98.6%</div>
+                <div style={styles.statSub}>42 Accepted / 0 Rejected</div>
+              </div>
+            </section>
+
+            {/* Category Revenue Breakdown & Weekly Trends */}
+            <div style={styles.analyticsRow}>
+              {/* Category Breakdown */}
+              <div style={{ ...styles.reportBox, flex: 1.2 }}>
+                <h3 style={styles.reportBoxTitle}>🍹 Category Revenue Split</h3>
+                <div style={styles.categoryBarList}>
+                  {[
+                    { name: 'Beer (Lager, Strong, Craft)', share: '46%', gmv: '₹19,400', color: '#F59E0B' },
+                    { name: 'Whiskey (Single Malt, Scotch)', share: '32%', gmv: '₹13,500', color: '#8B5CF6' },
+                    { name: 'Vodka & Gin', share: '12%', gmv: '₹5,060', color: '#3B82F6' },
+                    { name: 'Wine & Champagne', share: '6%', gmv: '₹2,530', color: '#EC4899' },
+                    { name: 'Mixers, Ice & Snacks', share: '4%', gmv: '₹1,690', color: '#10B981' },
+                  ].map((c) => (
+                    <div key={c.name} style={{ marginBottom: 14 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700 }}>
+                        <span>{c.name}</span>
+                        <span>
+                          {c.gmv} ({c.share})
+                        </span>
+                      </div>
+                      <div style={styles.progressBarBg}>
+                        <div style={{ ...styles.progressBarFill, width: c.share, background: c.color }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Weekly Performance Bar Chart */}
+              <div style={{ ...styles.reportBox, flex: 1 }}>
+                <h3 style={styles.reportBoxTitle}>📈 Last 7 Days Revenue Trend</h3>
+                <div style={styles.chartContainer}>
+                  {[
+                    { day: 'Mon', gmv: '₹34k', height: '60%' },
+                    { day: 'Tue', gmv: '₹28k', height: '48%' },
+                    { day: 'Wed', gmv: '₹36k', height: '65%' },
+                    { day: 'Thu', gmv: '₹39k', height: '70%' },
+                    { day: 'Fri', gmv: '₹58k', height: '95%' },
+                    { day: 'Sat', gmv: '₹62k', height: '100%' },
+                    { day: 'Sun (Today)', gmv: '₹42k', height: '75%' },
+                  ].map((b) => (
+                    <div key={b.day} style={styles.chartCol}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: '#0C831F' }}>{b.gmv}</div>
+                      <div style={styles.chartBarTrack}>
+                        <div style={{ ...styles.chartBarFill, height: b.height }} />
+                      </div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', marginTop: 6 }}>{b.day}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Bank Settlements Table */}
+            <div style={styles.tableCard}>
+              <div style={styles.tableHeader}>
+                <div style={{ flex: 2 }}>SETTLEMENT ID & DATE</div>
+                <div style={{ flex: 1.5 }}>ORDERS PROCESSED</div>
+                <div style={{ flex: 1.5 }}>GROSS GMV</div>
+                <div style={{ flex: 1.5 }}>COMMISSION (8%)</div>
+                <div style={{ flex: 2 }}>NET SETTLED AMOUNT</div>
+                <div style={{ flex: 1, textAlign: 'right' }}>STATUS</div>
+              </div>
+
+              {[
+                { id: 'SETTL-8921', date: 'Yesterday (31 Aug)', orders: 38, gross: '₹54,200', comm: '₹4,336', net: '₹49,864', status: 'PAID' },
+                { id: 'SETTL-8920', date: '30 Aug', orders: 44, gross: '₹61,400', comm: '₹4,912', net: '₹56,488', status: 'PAID' },
+                { id: 'SETTL-8919', date: '29 Aug', orders: 31, gross: '₹39,800', comm: '₹3,184', net: '₹36,616', status: 'PAID' },
+                { id: 'SETTL-8918', date: '28 Aug', orders: 29, gross: '₹35,100', comm: '₹2,808', net: '₹32,292', status: 'PAID' },
+              ].map((s) => (
+                <div key={s.id} style={styles.tableRow}>
+                  <div style={{ flex: 2 }}>
+                    <div style={{ fontWeight: 800, fontSize: 14 }}>{s.id}</div>
+                    <div style={{ fontSize: 12, color: '#666' }}>{s.date}</div>
+                  </div>
+                  <div style={{ flex: 1.5, fontWeight: 700 }}>{s.orders} Orders</div>
+                  <div style={{ flex: 1.5, fontWeight: 700 }}>{s.gross}</div>
+                  <div style={{ flex: 1.5, color: '#EF4444', fontWeight: 700 }}>- {s.comm}</div>
+                  <div style={{ flex: 2, fontWeight: 900, color: '#0C831F', fontSize: 16 }}>{s.net}</div>
+                  <div style={{ flex: 1, textAlign: 'right' }}>
+                    <span style={styles.settledBadge}>✓ {s.status}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* ========================================================================= */}
@@ -1491,6 +1915,268 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: radius.pill,
     fontWeight: 800,
     cursor: 'pointer',
+  },
+
+  // Orders Tab Styles
+  orderStatusPills: {
+    display: 'flex',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  orderFilterBtn: {
+    padding: '8px 16px',
+    borderRadius: radius.pill,
+    border: '1px solid #E5E7EB',
+    background: '#FFFFFF',
+    color: '#4B5563',
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
+  orderFilterBtnActive: {
+    background: '#111827',
+    color: '#FFFFFF',
+    borderColor: '#111827',
+  },
+  ordersGrid: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
+  },
+  orderCard: {
+    background: '#FFFFFF',
+    border: '1px solid #E5E7EB',
+    borderRadius: radius.lg,
+    padding: 24,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+  },
+  orderCardNew: {
+    border: '2px solid #EF4444',
+    boxShadow: '0 4px 16px rgba(239, 68, 68, 0.12)',
+  },
+  orderCardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingBottom: 16,
+    borderBottom: '1px solid #F3F4F6',
+  },
+  orderIdBadge: {
+    fontSize: 16,
+    fontWeight: 900,
+    color: '#111827',
+  },
+  paymentPill: {
+    fontSize: 11,
+    fontWeight: 800,
+    background: '#E8F7EC',
+    color: '#0C831F',
+    padding: '2px 8px',
+    borderRadius: radius.pill,
+  },
+  orderCustomerMeta: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  statusBadge: {
+    display: 'inline-block',
+    fontSize: 11,
+    fontWeight: 900,
+    padding: '4px 10px',
+    borderRadius: radius.pill,
+    letterSpacing: 0.5,
+  },
+  itemsBox: {
+    margin: '16px 0',
+    background: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+  },
+  itemsBoxTitle: {
+    fontSize: 11,
+    fontWeight: 900,
+    color: '#6B7280',
+    letterSpacing: 0.8,
+    marginBottom: 12,
+  },
+  orderItemRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 14,
+    padding: '8px 0',
+    borderBottom: '1px solid #E5E7EB',
+  },
+  orderItemThumb: {
+    width: 42,
+    height: 42,
+    borderRadius: 8,
+    objectFit: 'cover',
+  },
+  chilledItemBadge: {
+    display: 'inline-block',
+    background: '#E8F7EC',
+    color: '#0C831F',
+    fontSize: 10,
+    fontWeight: 800,
+    padding: '2px 6px',
+    borderRadius: radius.pill,
+  },
+  riderBar: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    background: '#F3F4F6',
+    borderRadius: 10,
+    padding: '10px 16px',
+    marginBottom: 16,
+  },
+  riderPhone: {
+    fontSize: 12,
+    fontWeight: 800,
+    color: '#2563EB',
+    background: '#EFF6FF',
+    padding: '4px 10px',
+    borderRadius: radius.pill,
+  },
+  orderCardFooter: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 16,
+    borderTop: '1px solid #F3F4F6',
+  },
+  orderActionsGroup: {
+    display: 'flex',
+    gap: 10,
+  },
+  orderAcceptBtn: {
+    background: '#0C831F',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: radius.pill,
+    padding: '10px 24px',
+    fontWeight: 800,
+    fontSize: 13,
+    cursor: 'pointer',
+    boxShadow: '0 4px 12px rgba(12, 131, 31, 0.25)',
+  },
+  orderRejectBtn: {
+    background: 'transparent',
+    color: '#EF4444',
+    border: '1.5px solid #EF4444',
+    borderRadius: radius.pill,
+    padding: '10px 18px',
+    fontWeight: 800,
+    fontSize: 13,
+    cursor: 'pointer',
+  },
+  orderPackReadyBtn: {
+    background: '#2563EB',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: radius.pill,
+    padding: '10px 24px',
+    fontWeight: 800,
+    fontSize: 13,
+    cursor: 'pointer',
+  },
+  orderHandoverBtn: {
+    background: '#111827',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: radius.pill,
+    padding: '10px 24px',
+    fontWeight: 800,
+    fontSize: 13,
+    cursor: 'pointer',
+  },
+  emptyOrderBox: {
+    background: '#FFFFFF',
+    borderRadius: 16,
+    padding: '60px 20px',
+    textAlign: 'center',
+    border: '1px solid #E5E7EB',
+  },
+
+  // Reports / Sales Tab Styles
+  bankCard: {
+    background: '#FFFFFF',
+    border: '1px solid #E5E7EB',
+    borderRadius: 12,
+    padding: '12px 18px',
+    textAlign: 'right',
+  },
+  analyticsRow: {
+    display: 'flex',
+    gap: 20,
+    marginBottom: 24,
+  },
+  reportBox: {
+    background: '#FFFFFF',
+    border: '1px solid #E5E7EB',
+    borderRadius: radius.lg,
+    padding: 24,
+  },
+  reportBoxTitle: {
+    margin: '0 0 16px',
+    fontSize: 16,
+    fontWeight: 900,
+    color: '#111827',
+  },
+  categoryBarList: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  progressBarBg: {
+    height: 8,
+    background: '#F3F4F6',
+    borderRadius: 999,
+    overflow: 'hidden',
+    marginTop: 6,
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 999,
+  },
+  chartContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    height: 180,
+    paddingTop: 20,
+  },
+  chartCol: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    flex: 1,
+    height: '100%',
+    justifyContent: 'flex-end',
+  },
+  chartBarTrack: {
+    width: 24,
+    height: 120,
+    background: '#F3F4F6',
+    borderRadius: '6px 6px 0 0',
+    display: 'flex',
+    alignItems: 'flex-end',
+    overflow: 'hidden',
+    marginTop: 6,
+  },
+  chartBarFill: {
+    width: '100%',
+    background: '#0C831F',
+    borderRadius: '6px 6px 0 0',
+    transition: 'height 0.3s ease',
+  },
+  settledBadge: {
+    background: '#E8F7EC',
+    color: '#0C831F',
+    fontSize: 11,
+    fontWeight: 800,
+    padding: '4px 10px',
+    borderRadius: radius.pill,
   },
 
   // Modal Styles
