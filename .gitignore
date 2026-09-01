@@ -72,17 +72,24 @@ apps/backend/prisma/*.db
 apps/backend/prisma/*.db-journal
 
 # -----------------------------------------------------------------------------
-# Operating System & IDE Files
+# IDE, AI & Tool Directories (Excluded from Git)
 # -----------------------------------------------------------------------------
+.claude/
+.vscode/
+.kombai/
+.husky/
+.idea/
 .DS_Store
 Thumbs.db
 Desktop.ini
-.idea/
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
 *.swp
 *.swo
+
+# -----------------------------------------------------------------------------
+# Documentation & Task Files (Excluded from Git)
+# -----------------------------------------------------------------------------
+docs/
+TASK.md
 
 # -----------------------------------------------------------------------------
 # Logs & Testing Coverage
