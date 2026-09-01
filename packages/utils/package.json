@@ -1,0 +1,18 @@
+{
+  "name": "@drinkit/utils",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"lint: utils ok\""
+  },
+  "devDependencies": {
+    "@drinkit/tsconfig": "workspace:*",
+    "typescript": "^5.7.3"
+  }
+}

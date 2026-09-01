@@ -1,0 +1,12 @@
+{
+  "name": "@drinkit/tsconfig",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./base.json": "./base.json",
+    "./nestjs.json": "./nestjs.json",
+    "./nextjs.json": "./nextjs.json",
+    "./react-native.json": "./react-native.json"
+  },
+  "files": ["base.json", "nestjs.json", "nextjs.json", "react-native.json"]
+}

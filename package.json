@@ -1,0 +1,51 @@
+{
+  "name": "drinkit",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Drinkit — hyperlocal alcohol delivery platform (India)",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:customer": "npm run dev -w @drinkit/customer",
+    "dev:delivery": "npm run dev -w @drinkit/delivery",
+    "dev:store": "npm run dev -w @drinkit/store",
+    "dev:admin": "npm run dev -w @drinkit/admin",
+    "dev:backend": "npm run dev -w @drinkit/backend",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "prepare": "node -e \"try{require('husky')}catch(e){}\"",
+    "docker:up": "docker compose -f infra/docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "db:generate": "npm run prisma:generate -w @drinkit/backend",
+    "db:migrate": "npm run prisma:migrate -w @drinkit/backend",
+    "db:studio": "npm run prisma:studio -w @drinkit/backend"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

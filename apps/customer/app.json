@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Drinkit",
+    "slug": "drinkit-customer",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "drinkit",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#F8CB46"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.drinkit.customer"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F8CB46"
+      },
+      "package": "com.drinkit.customer"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

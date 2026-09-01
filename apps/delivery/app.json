@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Drinkit Partner",
+    "slug": "drinkit-delivery",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "drinkit-partner",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0D0D0D"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.drinkit.delivery"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0D0D0D"
+      },
+      "package": "com.drinkit.delivery"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
